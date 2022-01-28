@@ -26,7 +26,7 @@ namespace EasyRpt
             }
             #endregion
 
-            //send report loog
+            //send reports loop
             var smtp = _Fun.Smtp;
             foreach (var rpt in rpts)
             {
@@ -49,14 +49,17 @@ namespace EasyRpt
 
                 //4.set attachment
                 ms.Position = 0;
-                Attachment attach = new Attachment(ms, new ContentType(ContentTypeEstr.Excel));
-                attach.Name = rptName + ".xlsx";
+                var attach = new Attachment(ms, new ContentType(ContentTypeEstr.Excel))
+                {
+                    Name = rptName + ".xlsx"
+                };
                 msg.Attachments.Add(attach);
 
                 //5.send email
                 await _Email.SendByMsgAsync(msg, smtp);    //sync send for stream attachment !!
                 ms.Close(); //close after send email, or get error: cannot access a closed stream !!
 
+                //log result
                 await _Log.InfoAsync(preLog + "Send " + rptName);
             }
 
